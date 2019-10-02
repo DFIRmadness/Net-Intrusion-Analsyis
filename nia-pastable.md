@@ -27,24 +27,23 @@ To locate the absolute date and time of the packets:
 
 Straight from the 503 Course.
 
-1. Most Exlusive - Select packets where ONLY (No others) these flags (ex. SYN/FIN) are set:
+1. Most Exlusive - Select packets where *ONLY* (No others) these flags (ex. SYN/FIN) are set:
 
     `tcpdump -r pcap.pcap -nt 'tcp[13] = 0x03'`
 
-2. Less Exclusive - Select packets where BOTH SYN/FIN are set and CAN have any other flag set:
+2. Less Exclusive - Select packets where *BOTH* SYN/FIN are set and CAN have any other flag set:
 
     `tcpdump -r pcap.pcap -nt 'tcp[13] & 0x03 = 0x03'`
 
-3. Least Exclusive - Select packets where either SYN OR FIN are set; and an other flag can be set:
+3. Least Exclusive - Select packets where *EITHER* SYN *OR* FIN are set; and an other flag can be set:
 
     `tcpdump -r pcap.pcap -nt 'tcp[13] & 0x03 !=0'`
 
 ### Flags Table
-|2<sup>3</sup>|2<sup>2</sup>|2<sup>1</sup>|2<sup>0</sup>|---|2<sup>3</sup>|2<sup>2</sup>|2<sup>1</sup>|2<sup>0</sup>|
-
-|---|---|---|---|---|---|---|---|
-
+|2<sup>3</sup>|2<sup>2</sup>|2<sup>1</sup>|2<sup>0</sup>|-|2<sup>3</sup>|2<sup>2</sup>|2<sup>1</sup>|2<sup>0</sup>|
+|---|---|---|---|---|---|---|---|---|
 |CWR|ECE|URG|ACK|---|PSH|RST|SYN|FIN
+|8|4|2|1|-|8|4|2|1|
 
 #### Isolatinng Hosts and Networks
 
