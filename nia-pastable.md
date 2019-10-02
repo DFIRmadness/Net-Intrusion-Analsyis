@@ -8,6 +8,24 @@ To locate the absolute date and time of the packets:
 
 `tcpdump -n -r dmz.cap -tttt -c 1`
 
+### Common tcpdump Macros
+
+### tcpdump BPF filters levels
+
+Straight from the 503 Course.
+
+1. Most Exlusive - Select packets where ONLY (No others) these flags (ex. SYN/FIN) are set:
+
+    `tcpdump -r pcap.pcap -nt 'tcp[13] = 0x03'`
+
+2. Less Exclusive - Select packets where BOTH SYN/FIN are set and CAN have any other flag set:
+
+    `tcpdump -r pcap.pcap -nt 'tcp[13] & 0x03 = 0x03'`
+
+3. Least Exclusive - Select packets where either SYN OR FIN are set; and an other flag can be set:
+
+    `tcpdump -r pcap.pcap -nt 'tcp[13] & 0x03 !=0'`
+
 #### Isolatinng Hosts and Networks
 
 src net; dst net
@@ -21,6 +39,10 @@ src net; dst net
 #### To find SYN/ACK packets in a pcap
 
 `tcpdump -r pcap.pcap -n 'tcp[13] = 0x12'`
+
+To find  SYN ACK along with any other flags:
+
+`tcpdump -nt -r int-server.pcap 'tcp[13] & 0x02 = 0x02'|awk '{print $4}'|cut -d '.' -f5|sort -un`
 
 #### To find SYN/ACK packets in a pcap
 
