@@ -1,4 +1,6 @@
-# SEC503 Pastables
+# Network Intrusion Analysis Pastable
+
+##### Most of these came during my time in SANS SEC503.  Much credit to their material and to David Hoelzer.
 
 ## tcpdump
 
