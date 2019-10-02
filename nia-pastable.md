@@ -10,6 +10,19 @@ To locate the absolute date and time of the packets:
 
 ### Common tcpdump Macros
 
+1. host - IP Address of host
+2. net - designate a subnet; even partial works 'net 192.168'
+3. port - source OR destination port
+4. src host
+5. dst host
+6. src net
+7. dst net
+8. src port
+9. dst port
+10. icmp - proto field ip[9] = 1
+11. tcp - proto field ip[9] = 6
+12. udp - proto field ip[9] = 17
+
 ### tcpdump BPF filters levels
 
 Straight from the 503 Course.
@@ -25,6 +38,13 @@ Straight from the 503 Course.
 3. Least Exclusive - Select packets where either SYN OR FIN are set; and an other flag can be set:
 
     `tcpdump -r pcap.pcap -nt 'tcp[13] & 0x03 !=0'`
+
+### Flags Table
+|2<sup>3</sup>|2<sup>2</sup>|2<sup>1</sup>|2<sup>0</sup>|---|2<sup>3</sup>|2<sup>2</sup>|2<sup>1</sup>|2<sup>0</sup>|
+
+|---|---|---|---|---|---|---|---|
+
+|CWR|ECE|URG|ACK|---|PSH|RST|SYN|FIN
 
 #### Isolatinng Hosts and Networks
 
