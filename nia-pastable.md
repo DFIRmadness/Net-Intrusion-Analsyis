@@ -117,3 +117,21 @@ Note:  SiLK by default will search its /data repository if not given another sou
 
 `rwfilter --type=all --proto=0-255 --start-date=2018/11/06T21 --end-date=2018/11/06T21 --pass=stdout | rwstats --fields=sip --values=bytes --count=10`
 
+## Wireshark
+
+### Wireshark Filters
+
+Find Executables in Traffic
+`tcp contains "DOS mode"`
+
+Port 80 Traffic with Executables
+`tcp.port == 80 and tcp contains "DOS mode"`
+
+Find GIFs in exported OBJs Dir
+` grep '^GIF89a' *`
+
+Find PEs in exported OBJs Dir
+`grep 'DOS mode' *`
+
+Find Executables in exported OBJs Dir
+`grep '^MZ' *`
