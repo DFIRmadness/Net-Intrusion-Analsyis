@@ -45,17 +45,19 @@ Straight from the 503 Course.
 |CWR|ECE|URG|ACK|---|PSH|RST|SYN|FIN
 |8|4|2|1|-|8|4|2|1|
 
-#### Isolatinng Hosts and Networks
+### Isolatinng Hosts and Networks
 
 src net; dst net
 
 `src net 192.168.0.0/16 and not dst net 192.168.0.0/16`
 
-#### To find SYN packets in a pcap
+### Isolating Packets with Specific Flags
+
+To find SYN packets in a pcap
 
 `tcpdump -r pcap.pcap -n 'tcp[13]=0x02'`
 
-#### To find SYN/ACK packets in a pcap
+To find SYN/ACK packets in a pcap
 
 `tcpdump -r pcap.pcap -n 'tcp[13] = 0x12'`
 
@@ -63,31 +65,75 @@ To find  SYN ACK along with any other flags:
 
 `tcpdump -nt -r int-server.pcap 'tcp[13] & 0x02 = 0x02'|awk '{print $4}'|cut -d '.' -f5|sort -un`
 
-#### To find SYN/ACK packets in a pcap
+To find SYN/ACK packets in a pcap
 
 `tcpdump -r pcap.pcap -n 'tcp[13] = 0x12'`
 
-#### To find SYN/ACK packets with ENC Bits ignored (allowing for ENC Enabled Systems)
+To find SYN/ACK packets with ENC Bits ignored (allowing for ENC Enabled Systems)
 
 `tcpdump -r dmz.cap -n 'tcp[13]&0x3f=0x12'`
 
-#### Bringing it all together
+Find ECN enabled hosts in a home network
+
+`tcpdump -r backbone.cap -nt 'tcp[13]&0xc0 = 0x40 and tcp[13]&0x3f=0x12'`
+
+Find a host from 192.168.0.0/16 that has port 111 open:
+
+`tcpdump -r backbone.cap -n 'src net 192.168.0.0/16 and tcp[13] & 0x3f = 0x12 and tcp src port 111'`
+
+Finding Fast Open or Data on the SYN packets
+
+`tcpdump -r backbone.cap -nt 'tcp[13]&2=2 && ip[2:2]-((ip[0]&0x0f)*4)-(tcp[12]>>4)*4>0'`
+
+### DNS Flag Isolation
+
+All DNS Queries
+
+`tcpdump -r dns.pcap -nt 'dst port 53 and udp[10] & 0x80 = 0'`
+
+All Responses
+
+`tcpdump -r dns.pcap -nt 'src port 53 and udp[10] & 0x80 = 0x80'`
+
+Responses with TC (Truncated)
+
+`tcpdump -r dns.pcap -nt 'src port 53 and udp[10] & 0x82 = 0x82'`
+
+Query with RD (Recursion Desired)
+
+`tcpdump -r dns.pcap -nt 'dst port 53 and udp[10] & 0x81 = 0x01'`
+
+Response with RD and RA (Recursion Available)
+
+`tcpdump -r dns.pcap -nt 'src port 53 and udp[10:2] & 0x8180 = 0x8180'`
+
+### Bringing it all together
 
 Identify which listening TCP port receives the greatest number of connection attempts from external systems
 
 `tcpdump -r dmz.cap -n 'tcp[13]&0x3f=0x12 and src net 192.168.0.0/16 and not dst net 192.168.0.0/16' | cut -d ' ' -f 3 | cut -d . -f 5 | sort -n | uniq -c | sort -n`
 
-#### Find ECN enabled hosts in a home network
+## Wireshark
 
-`tcpdump -r backbone.cap -nt 'tcp[13]&0xc0 = 0x40 and tcp[13]&0x3f=0x12'`
+### Wireshark Filters
 
-#### Find a host from 192.168.0.0/16 that has port 111 open:
+Find Executables in Traffic
+`tcp contains "DOS mode"`
 
-`tcpdump -r backbone.cap -n 'src net 192.168.0.0/16 and tcp[13] & 0x3f = 0x12 and tcp src port 111'`
+More extensive search for executables
+`frame contains "DOS mode" or tcp contains "DOS mode"`
 
-#### Finding Fast Open or Data on the SYN packets
+Port 80 Traffic with Executables
+`tcp.port == 80 and tcp contains "DOS mode"`
 
-`tcpdump -r backbone.cap -nt 'tcp[13]&2=2 && ip[2:2]-((ip[0]&0x0f)*4)-(tcp[12]>>4)*4>0'`
+Find GIFs in exported OBJs Dir
+`grep '^GIF89a' *`
+
+Find PEs in exported OBJs Dir
+`grep 'DOS mode' *`
+
+Find Executables in exported OBJs Dir
+`grep '^MZ' *`
 
 ## Hunting the Network
 
@@ -101,37 +147,19 @@ Run Snort to discover if any alters triggered.
 
 Note:  SiLK by default will search its /data repository if not given another source to read from.
 
-#### To search all protos in a given date range and get the number of flows:
+To search all protos in a given date range and get the number of flows:
 
 `rwfilter --type=all --start-date 2018/10/01 --end-date 2018/10/15 --proto=0-255 --print-stat`
 
-#### To see how many TCP flows occurred in a certain date range:
+To see how many TCP flows occurred in a certain date range:
 
 `rwfilter --type=all --start-date=2018/10/01 --end-date=2018/10/15 --proto=6 --print-stat`
 
-#### To find all of the TCP ports that were connected to in a certaing time range in repo:
+To find all of the TCP ports that were connected to in a certaing time range in repo:
 
 `rwfilter --type=all --start-date 2018/10/1 --end-date 2018/10/31 --proto=6 --flags-initial S/SA --pass stdout | rwstats --count=20 --field dport`
 
-#### To find the top talker
+To find the top talker
 
 `rwfilter --type=all --proto=0-255 --start-date=2018/11/06T21 --end-date=2018/11/06T21 --pass=stdout | rwstats --fields=sip --values=bytes --count=10`
 
-## Wireshark
-
-### Wireshark Filters
-
-Find Executables in Traffic
-`tcp contains "DOS mode"`
-
-Port 80 Traffic with Executables
-`tcp.port == 80 and tcp contains "DOS mode"`
-
-Find GIFs in exported OBJs Dir
-` grep '^GIF89a' *`
-
-Find PEs in exported OBJs Dir
-`grep 'DOS mode' *`
-
-Find Executables in exported OBJs Dir
-`grep '^MZ' *`
