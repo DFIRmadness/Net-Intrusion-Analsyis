@@ -85,6 +85,9 @@ Finding Fast Open or Data on the SYN packets
 
 `tcpdump -r backbone.cap -nt 'tcp[13]&2=2 && ip[2:2]-((ip[0]&0x0f)*4)-(tcp[12]>>4)*4>0'`
 
+Find hosts who support ECN and have ports listening
+`tcpdump -r backbone.cap -n 'tcp[13]&0xc0 = 0x40 and tcp[13]&0x3f=0x12'`
+
 ### DNS Flag Isolation
 
 All DNS Queries
@@ -143,7 +146,7 @@ Run Snort to discover if any alters triggered.
 
 `snort -A console -q -K none -c ./snort.conf -r the.pcap`
 
-## SiLK for Hunting
+### SiLK for Hunting
 
 Note:  SiLK by default will search its /data repository if not given another source to read from.
 
@@ -151,7 +154,7 @@ To search all protos in a given date range and get the number of flows:
 
 `rwfilter --type=all --start-date 2018/10/01 --end-date 2018/10/15 --proto=0-255 --print-stat`
 
-To see how many TCP flows occurred in a certain date range:
+To see how many TCP flows occurred in a certain date range (the 'read' count is number of flows):
 
 `rwfilter --type=all --start-date=2018/10/01 --end-date=2018/10/15 --proto=6 --print-stat`
 
