@@ -49,7 +49,7 @@ Straight from the 503 Course.
 
 src net; dst net
 
-`src net 192.168.0.0/16 and not dst net 192.168.0.0/16`
+`src net 10.0.0.0/16 and not dst net 10.0.0.0/16`
 
 ### Isolating Packets with Specific Flags
 
@@ -77,15 +77,16 @@ Find ECN enabled hosts in a home network
 
 `tcpdump -r backbone.cap -nt 'tcp[13]&0xc0 = 0x40 and tcp[13]&0x3f=0x12'`
 
-Find a host from 192.168.0.0/16 that has port 111 open:
+Find a host from 10.0.0.0/16 that has port 111 open:
 
-`tcpdump -r backbone.cap -n 'src net 192.168.0.0/16 and tcp[13] & 0x3f = 0x12 and tcp src port 111'`
+`tcpdump -r backbone.cap -n 'src net 10.0.0.0/16 and tcp[13] & 0x3f = 0x12 and tcp src port 111'`
 
 Finding Fast Open or Data on the SYN packets
 
 `tcpdump -r backbone.cap -nt 'tcp[13]&2=2 && ip[2:2]-((ip[0]&0x0f)*4)-(tcp[12]>>4)*4>0'`
 
 Find hosts who support ECN and have ports listening
+
 `tcpdump -r backbone.cap -n 'tcp[13]&0xc0 = 0x40 and tcp[13]&0x3f=0x12'`
 
 ### DNS Flag Isolation
@@ -114,32 +115,37 @@ Response with RD and RA (Recursion Available)
 
 Identify which listening TCP port receives the greatest number of connection attempts from external systems
 
-`tcpdump -r dmz.cap -n 'tcp[13]&0x3f=0x12 and src net 192.168.0.0/16 and not dst net 192.168.0.0/16' | cut -d ' ' -f 3 | cut -d . -f 5 | sort -n | uniq -c | sort -n`
+`tcpdump -r dmz.cap -n 'tcp[13]&0x3f=0x12 and src net 10.0.0.0/16 and not dst net 10.0.0.0/16' | cut -d ' ' -f 3 | cut -d . -f 5 | sort -n | uniq -c | sort -n`
 
 ## Wireshark
 
 ### Wireshark Filters
 
 Find Executables in Traffic
+
 `tcp contains "DOS mode"`
 
 More extensive search for executables
+
 `frame contains "DOS mode" or tcp contains "DOS mode"`
 
 Port 80 Traffic with Executables
+
 `tcp.port == 80 and tcp contains "DOS mode"`
 
 Find GIFs in exported OBJs Dir
+
 `grep '^GIF89a' *`
 
 Find PEs in exported OBJs Dir
+
 `grep 'DOS mode' *`
 
 Find Executables in exported OBJs Dir
+
 `grep '^MZ' *`
 
 ## Hunting the Network
-
 ### Snort
 
 Run Snort to discover if any alters triggered.
@@ -150,19 +156,53 @@ Run Snort to discover if any alters triggered.
 
 Note:  SiLK by default will search its /data repository if not given another source to read from.
 
+#### Quick Reference for SiLK Options
+|Tool or Switch|Summary|
+|---|---|
+|**rwfilter**||
+|start-date|Date YYYY/MM/DD or YYYY/MM/DD**T***hour* 2019/09/31T14|
+|end-date||
+|proto|0-255 (1 for ICMP,6 for TCP, 17 for UDP)|
+|dport|Destination Port|
+|sport|Source Port|
+|scidr|Source CIDR. Can be a list: 10.5.0.48.0/24,10.5.50.0/24|
+|dcidr|Destination CIDR|
+|flags-initial|Flag You Want Select / Flags Masked ON. Exemple: SYN's only would be S/SA|
+|||
+|**rwstats**||
+|--fields--|Select fields to display:|
+|dport|Destionation Port|
+|sip|Source IP|
+|stime|Start Time|
+|--values--|Sort by values:|
+|bytes|Sort by bytes|
+|||
+|**rwcut**||
+|sip|Source IP|
+|dip|Destination IP|
+|sport|Source Port|
+|dport|Destination Port|
+|stime|Start Time|
+|etime|End Time|
+|bytes|Bye Count|
+
+
 To search all protos in a given date range and get the number of flows:
 
-`rwfilter --type=all --start-date 2018/10/01 --end-date 2018/10/15 --proto=0-255 --print-stat`
+`rwfilter --type=all --start-date 2019/09/01 --end-date 2019/09/15 --proto=0-255 --print-stat`
 
 To see how many TCP flows occurred in a certain date range (the 'read' count is number of flows):
 
-`rwfilter --type=all --start-date=2018/10/01 --end-date=2018/10/15 --proto=6 --print-stat`
+`rwfilter --type=all --start-date=2019/09/01 --end-date=2019/09/15 --proto=6 --print-stat`
 
 To find all of the TCP ports that were connected to in a certaing time range in repo:
 
-`rwfilter --type=all --start-date 2018/10/1 --end-date 2018/10/31 --proto=6 --flags-initial S/SA --pass stdout | rwstats --count=20 --field dport`
+`rwfilter --type=all --start-date 2018/10/1 --end-date 2019/09/31 --proto=6 --flags-initial S/SA --pass stdout | rwstats --count=20 --field dport`
 
 To find the top talker
 
-`rwfilter --type=all --proto=0-255 --start-date=2018/11/06T21 --end-date=2018/11/06T21 --pass=stdout | rwstats --fields=sip --values=bytes --count=10`
+`rwfilter --type=all --proto=0-255 --start-date=2019/09/31T14 --end-date=2019/09/31T14 --pass=stdout | rwstats --fields=sip --values=bytes --count=10`
 
+Example of finding the time that a flow of large bytes began
+
+`rwfilter --type=all --proto=0-255 --start-date=2019/09/31T14 --end-date=2019/09/31T23 --pass=stdout | rwstats --fields=sip,stime --value=bytes --count=10`
