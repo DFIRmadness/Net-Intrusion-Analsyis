@@ -232,13 +232,15 @@ Note:  SiLK by default will search its /data repository if not given another sou
 |--not-daddress|Not destination address|
 |--print-stat|Print statistics of the selected repo's. **Note: the PASS value is the qty of files in your selection**|
 |||
-|**rwstats**||
+|**rwstats**|Fields are what you see; Values are what you sort by|
 |--fields--|Select fields to display:|
 |dport|Destionation Port|
 |sip|Source IP|
 |stime|Start Time|
 |--values--|Sort by values:|
 |bytes|Sort by bytes|
+|flows|Sort by amount of flows|
+|packets|Sort by packets|
 |||
 |**rwcut**|--fields=field1,field2,field3 . . . or -f 9|
 |sip|Source IP|
@@ -253,6 +255,13 @@ Note:  SiLK by default will search its /data repository if not given another sou
 |**rwuniq**||
 |--fields|Select field to order by unique-ness|
 |Example Fields|sip,dip,sport,dport. Useful when combined with pre-filter in rwfilter|
+
+General idea of rwfilter:
+You feed it some paramaters and say whether you want the records that pass the test or the records that fail the test and then where to send them.
+
+rwfilter can select records inverse of the test (fail=stdout) and send them to a pipe for another rwfilter that in turn selects records that pass (--input-pipe=stdin and --pass=stdout)
+
+-------------Examples----------------------------
 
 To search all protos in a given date range and get the number of flows:
 
@@ -282,6 +291,21 @@ rwfilter against a file
 
 `rwfilter incident.silk`
 
+Filter on external all external hosts sending traffic to your network
+
+`rwfilter external.silk --scidr 148.21.5.0/24 --fail=stdout | rwfilter --input-pipe=stdin --dcidr=148.21.5.0/24 --pass=stdout | rwuniq --fields=sIP --values=packets --no-titles`
+
+Stats on protocols in the flows
+
+`rwstats --proto --count=10`
+
+Top 5 Source IP's by amount of flows
+
+`rwstats --fields=sip --count=5 --values=flows`
+
+Unique Source IP by Flow
+
+`rwuniq --fields=sip --values=flows`
 
 ## Bro/Zeek
 
