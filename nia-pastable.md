@@ -187,6 +187,23 @@ Quickly find amount of payload in a conversation:
 
 ## Snort
 
+### Snort Command Line Cheat Sheet
+
+|Option|Explanation|
+|---|---|
+|-Tc \<config file\> or -T -c|Test configuration file|
+|-c| Define configuration file path|
+|-r|Read a single pcap|
+|-pcap-dir=\<dir\>|Reads back a directory of pcaps|
+|-A|Alternate Alert Modes: Full, Fast, None, Console|
+|-s|Alert to Syslog|
+|-v|Print alert information|
+|-K|ASII Log Mode|
+|-l \<logdir\>|Log packets in tcpdump|
+|-N|No logging|
+|-D|Run in background|
+|-i|Listen to specific network interface|
+
 ### Snort rules numbers
 
 |GID:|SID:|VER|
@@ -212,11 +229,11 @@ Extract and sort alerts by SID by frequency in ascending order
 
 `cat alert.dmz |awk '{print $3}'|tr -d '[]'|cut -d ':' -f 2|sort|uniq -c|sort -n`
 
-### SiLK for Hunting
+## SiLK
 
 Note:  SiLK by default will search its /data repository if not given another source to read from.
 
-#### Quick Reference for SiLK Options
+### Quick Reference for SiLK Options
 |Tool or Switch|Summary|
 |---|---|
 |**rwfilter**||
@@ -225,19 +242,22 @@ Note:  SiLK by default will search its /data repository if not given another sou
 |--proto|0-255 (1 for ICMP,6 for TCP, 17 for UDP)|
 |--dport|Destination Port|
 |--sport|Source Port|
+|--aport|Port as either source or destination|
 |--scidr|Source CIDR. Can be a list: 10.5.0.48.0/24,10.5.50.0/24|
 |--dcidr|Destination CIDR|
+|--not-dcidr|Destination CIDR is not...|
+|--not-scidr|Source CIDR is not...|
 |--flags-initial|Flag You Want Select / Flags Masked ON. Exemple: SYN's only would be S/SA|
 |--ip-version|Select the IP Version (4\|6)|
 |--not-daddress|Not destination address|
 |--print-stat|Print statistics of the selected repo's. **Note: the PASS value is the qty of files in your selection**|
 |||
-|**rwstats**|Fields are what you see; Values are what you sort by|
-|--fields--|Select fields to display:|
+|**rwstats**|Fields organize by; Values are what count by....|
+|--fields--|Fields select the bins you want **organize** data by:|
 |dport|Destionation Port|
 |sip|Source IP|
 |stime|Start Time|
-|--values--|Sort by values:|
+|--values--|Values are the data that you are **interested** in:|
 |bytes|Sort by bytes|
 |flows|Sort by amount of flows|
 |packets|Sort by packets|
@@ -250,6 +270,7 @@ Note:  SiLK by default will search its /data repository if not given another sou
 |stime|Start Time|
 |etime|End Time|
 |bytes|Bye Count|
+|flags|See flags involved in conversation|
 |--no-titles|Remove titles... great for when piping to wc -l for a line count|
 |||
 |**rwuniq**||
@@ -307,6 +328,14 @@ Unique Source IP by Flow
 
 `rwuniq --fields=sip --values=flows`
 
+Unique TCP Ports that hosts in the Defended Network attempted to connect to:
+
+`rwfilter external.silk --proto=6 --saddress="<External WAN IP>" --flags-initial=S/SA --pass=stdout|rwuniq --fields=dport --no-titles`
+
+Find top outbound port from defended network
+
+`rwfilter external.silk --saddress="<External WAN IP of Defended Network>" --flags-initial=S/SA --pass=stdout|rwstats --fields=dport --values=flows --count=10`
+
 ## Bro/Zeek
 
 |Bro Switches||
@@ -331,4 +360,3 @@ Bro readback from a pcap.  Make and change into a dir where you want the logs ge
 Find the a particular user's mail client location.  Use from field combined with source IP. Example: find tuser's internal IP of where they are using their mail client.
 
 `cat backbone/smtp.log |bro-cut ts -d from reply_to id.orig_h id.resp_h|grep "tuser"|head -3`
-
