@@ -185,6 +185,23 @@ Quickly find amount of payload in a conversation:
 
 `Follow the stream. Look at the lower left corner and the bytes in the pulldown is the total payload txfr`
 
+## tshark
+
+### tshark cutsheet
+
+|Switch|Function|
+|---|---|
+|-r|Read a PCAP|
+|tcp.stream == n|n is TCP Stream Number|
+
+Find file download in a certain stream
+
+`tshark -r cap.pcap 'tcp.stream == 1'|head -5`
+
+or file downloads in general with finding the GET request
+
+`tshark -r cap.pcap ''`
+
 ## Snort
 
 ### Snort Command Line Cheat Sheet
