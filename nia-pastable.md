@@ -133,8 +133,6 @@ Identify which listening TCP port receives the greatest number of connection att
 
 `tcpdump -r dmz.cap -n 'tcp[13]&0x3f=0x12 and src net 10.0.0.0/16 and not dst net 10.0.0.0/16' | cut -d ' ' -f 3 | cut -d . -f 5 | sort -n | uniq -c | sort -n`
 
-### Advanced tcpdump methods
-
 #### Finding which NAT'd host sent a packet.  Note the Seq number and destination ip:
 
 `tcpdump -n -r external.cap 'tcp port 445' -tttt -S | grep '22:37:01' | head -1`
@@ -154,6 +152,9 @@ Now find the internal ip matching any ethernet address noted above:
 `tcpdump -n -e -r dmz.cap 'ether src <noted ether address> and src net <home net cidr>' -c 1`
 
 ## Wireshark
+
+When searching for strings in side of 'packets' you search for what is in the **'Frame'**
+.
 
 ### Wireshark Filters
 
