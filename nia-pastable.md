@@ -307,6 +307,7 @@ Extract and sort alerts by SID by frequency in ascending order
 Note:  SiLK by default will search its /data repository if not given another source to read from.
 
 ### Quick Reference for SiLK Options
+
 |Tool or Switch|Summary|
 |---|---|
 |**rwfilter**||
@@ -443,3 +444,7 @@ Find the a particular user's mail client location.  Use from field combined with
 Quick look at file downloads and the host ip's involved
 
 `cat files.log |bro-cut -d fuid tx_hosts rx_hosts`
+
+Looking at Subject Lines of E-Mails
+
+`cat smtp.log | bro-cut -d ts from to subject`
