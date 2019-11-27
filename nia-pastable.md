@@ -1,6 +1,41 @@
 # Network Intrusion Analysis Pastable
 
-##### Most of these came during my time in SANS SEC503.  Much credit to their material and to David Hoelzer.
+Most of these came during my time in **SANS SEC503.  Much credit to their material and to David Hoelzer**.
+
+## Global Notes and Tables
+
+2 Bytes to Decimal Table
+|8 4 2 1|8 4 2 1|8 4 2 1|8 4 2 1|
+|:---:|:---:|:---:|:---:|
+|32768 16384 8192 4096|2048 1024 512 256|128 64 32 16|8 4 2 1|
+
+Hex to Decimal
+
+|0|1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+|0|1|2|3|4|5|6|7|8|9|A|B|C|D|E|F|
+
+### Bits, Bytes and Nibbles
+
+Example Breakdown and Mapping
+
+|0x|4|1|
+|:---:|:---:|:---:|
+|Bit Values|8421|8421|
+|0x41 Actual|0100|0001|
+|1 Bit On|0000|0001|
+|1 Nibble On|0000|1111|
+|1 Byte On|1111|1111|
+|Nibble Order|High|Low|
+
+- Bit = Single Switch of 1 (On/True) or 0 (Off/False)
+- Nibble = 4 Bits or half a byte. *The **4** in 0x41*
+- Byte = 8 Bits and represented with 0x41. A single printable character.
+- WORD = 16 Bits or 2 Bytes
+- DWORD = 32 Bits or 4 Bytes
+- QWORD = 64 Bits or 8 Bytes
+- IPv4 Address is a DWORD (32 Bits)
+- IPv6 Address is 128 Bits
 
 ## tcpdump
 
@@ -355,6 +390,12 @@ Find top outbound port from defended network
 `rwfilter external.silk --saddress="<External WAN IP of Defended Network>" --flags-initial=S/SA --pass=stdout|rwstats --fields=dport --values=flows --count=10`
 
 ## Bro/Zeek
+
+### Script locations
+
+- $PREFIX/share/bro/base are scripts included with Bro
+- $PREFIX/share/bro/site are custom scripts for the site
+- $PREFIX/share/bro/site/local.bro is the closest thing to a config file
 
 |Bro Switches||
 |---|---|
