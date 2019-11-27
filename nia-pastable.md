@@ -5,6 +5,7 @@ Most of these came during my time in **SANS SEC503.  Much credit to their materi
 ## Global Notes and Tables
 
 2 Bytes to Decimal Table
+
 |8 4 2 1|8 4 2 1|8 4 2 1|8 4 2 1|
 |:---:|:---:|:---:|:---:|
 |32768 16384 8192 4096|2048 1024 512 256|128 64 32 16|8 4 2 1|
@@ -16,6 +17,7 @@ Hex to Decimal
 |0|1|2|3|4|5|6|7|8|9|A|B|C|D|E|F|
 
 Flags Table
+
 |2<sup>3</sup>|2<sup>2</sup>|2<sup>1</sup>|2<sup>0</sup>|-|2<sup>3</sup>|2<sup>2</sup>|2<sup>1</sup>|2<sup>0</sup>|
 |---|---|---|---|---|---|---|---|---|
 |CWR|ECE|URG|ACK|---|PSH|RST|SYN|FIN
