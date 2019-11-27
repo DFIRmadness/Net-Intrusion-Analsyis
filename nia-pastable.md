@@ -250,9 +250,9 @@ Find file download in a certain stream
 
 `tshark -r cap.pcap 'tcp.stream == 1'|head -5`
 
-or file downloads in general with finding the GET request
+or file downloads in general with finding the GET request in stream 1
 
-`tshark -r cap.pcap ''`
+`tshark -r cap.pcap -n -q -z 'follow,tcp,ascii,1'|less`
 
 Gather statistics from a pcap for HTTP Methods used
 
