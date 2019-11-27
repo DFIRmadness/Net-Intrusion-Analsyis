@@ -15,6 +15,12 @@ Hex to Decimal
 |:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
 |0|1|2|3|4|5|6|7|8|9|A|B|C|D|E|F|
 
+Flags Table
+|2<sup>3</sup>|2<sup>2</sup>|2<sup>1</sup>|2<sup>0</sup>|-|2<sup>3</sup>|2<sup>2</sup>|2<sup>1</sup>|2<sup>0</sup>|
+|---|---|---|---|---|---|---|---|---|
+|CWR|ECE|URG|ACK|---|PSH|RST|SYN|FIN
+|8|4|2|1|-|8|4|2|1|
+
 ### Bits, Bytes and Nibbles
 
 Example Breakdown and Mapping
@@ -116,6 +122,10 @@ To find SYN/ACK packets with ENC Bits ignored (allowing for ENC Enabled Systems)
 
 `tcpdump -r dmz.cap -n 'tcp[13]&0x3f=0x12'`
 
+Alternate method for finding flags like RST
+
+`tcpdump -r backbone.cap -nt 'tcp[13] &0x3f = 0x04 !=0'`
+
 Find ECN enabled hosts in a home network
 
 `tcpdump -r backbone.cap -nt 'tcp[13]&0xc0 = 0x40 and tcp[13]&0x3f=0x12'`
@@ -201,6 +211,10 @@ More extensive search for executables
 
 `frame contains "DOS mode" or tcp contains "DOS mode"`
 
+Searching for images/files/anything by string search
+
+`frame contains "string_of_thing.gif"`
+
 Port 80 Traffic with Executables
 
 `tcp.port == 80 and tcp contains "DOS mode"`
@@ -237,6 +251,10 @@ Find file download in a certain stream
 or file downloads in general with finding the GET request
 
 `tshark -r cap.pcap ''`
+
+Gather statistics from a pcap for HTTP Methods used
+
+`tshark -r thepcap.cap -n -q -z http,tree`
 
 ## Snort
 
@@ -419,3 +437,7 @@ Bro readback from a pcap.  Make and change into a dir where you want the logs ge
 Find the a particular user's mail client location.  Use from field combined with source IP. Example: find tuser's internal IP of where they are using their mail client.
 
 `cat backbone/smtp.log |bro-cut ts -d from reply_to id.orig_h id.resp_h|grep "tuser"|head -3`
+
+Quick look at file downloads and the host ip's involved
+
+`cat files.log |bro-cut -d fuid tx_hosts rx_hosts`
